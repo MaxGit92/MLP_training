@@ -7,7 +7,7 @@ import os
 import matplotlib.pyplot as plt
 from sklearn import utils
 
-class MLP_training:
+class NN_training:
     """Classe utilisant la bibliothèque TensorFlow, permettant 
     d'entraîner un réseau de neurones, mais aussi de trouver 
     la structure la plus intéressante possible pour un certain 
@@ -296,11 +296,6 @@ class MLP_training:
         # Arrête la construction du reseau si une couche n'a pas de neurones
         stop_build = False
         
-        try:
-            N = N + [1]
-        except:
-            N = [1]
-        C = len(N)
         proj = 1
         for c in range(C):
             #liste des output pour une couche.
@@ -310,58 +305,58 @@ class MLP_training:
                 #Couche de entrée et sortie
                 if(c==C-1 and c==0):
                     # Définition des poids, biais et sortie
-                    dico["w"+str(c)+str(n)] = tf.Variable(tf.random_uniform([self.n_dim, output_dim], self.interval_init_weight[0], self.interval_init_weight[1]))
-                    dico["b"+str(c)+str(n)] = tf.Variable(tf.zeros([output_dim]))
+                    dico["w"+"_"+str(c)+"_"+str(n)] = tf.Variable(tf.random_uniform([self.n_dim, output_dim], self.interval_init_weight[0], self.interval_init_weight[1]))
+                    dico["b"+"_"+str(c)+"_"+str(n)] = tf.Variable(tf.zeros([output_dim]))
                     if(loss=='mse' or loss=='hinge'):
                         with tf.name_scope("prediction") as scope:
                             if(f!=tf.sigmoid and f!=tf.tanh):
                                 f=tf.sigmoid
-                            dico["y"+str(c)+str(n)] = f(tf.matmul(X, dico["w"+str(c)+str(n)]) + dico["b"+str(c)+str(n)])
+                            dico["y"+"_"+str(c)+"_"+str(n)] = f(tf.matmul(X, dico["w"+"_"+str(c)+"_"+str(n)]) + dico["b"+"_"+str(c)+"_"+str(n)])
                     else:
                         with tf.name_scope("prediction") as scope:
-                            dico["y"+str(c)+str(n)] = tf.nn.softmax(tf.matmul(X, dico["w"+str(c)+str(n)]) + dico["b"+str(c)+str(n)])
+                            dico["y"+"_"+str(c)+"_"+str(n)] = tf.nn.softmax(tf.matmul(X, dico["w"+"_"+str(c)+"_"+str(n)]) + dico["b"+"_"+str(c)+"_"+str(n)])
                     # Ajout de y à la list pour la couche actuelle
-                    list_y.append(dico["y"+str(c)+str(n)])
+                    list_y.append(dico["y"+"_"+str(c)+"_"+str(n)])
                                         
                 #Couche de sortie
                 elif(c==C-1):
                     # Définition des poids, biais et sortie
-                    dico["w"+str(c)+str(n)] = tf.Variable(tf.random_uniform([N[c-1]*proj, output_dim], self.interval_init_weight[0], self.interval_init_weight[1]))
-                    dico["b"+str(c)+str(n)] = tf.Variable(tf.zeros([output_dim]))
+                    dico["w"+"_"+str(c)+"_"+str(n)] = tf.Variable(tf.random_uniform([N[c-1]*proj, output_dim], self.interval_init_weight[0], self.interval_init_weight[1]))
+                    dico["b"+"_"+str(c)+"_"+str(n)] = tf.Variable(tf.zeros([output_dim]))
                     if(loss=='mse' or loss=='hinge'):
                         with tf.name_scope("prediction") as scope:
                             if(f!=tf.sigmoid and f!=tf.tanh):
                                 f=tf.sigmoid
-                            dico["y"+str(c)+str(n)] = f(tf.matmul(tf.concat(1, list_y_NN[c-1]), dico["w"+str(c)+str(n)]) + dico["b"+str(c)+str(n)])
+                            dico["y"+"_"+str(c)+"_"+str(n)] = f(tf.matmul(tf.concat(1, list_y_NN[c-1]), dico["w"+"_"+str(c)+"_"+str(n)]) + dico["b"+"_"+str(c)+"_"+str(n)])
                     else: #Cas cross_entropy
                         with tf.name_scope("prediction") as scope:
-                            dico["y"+str(c)+str(n)] = tf.nn.softmax(tf.matmul(tf.concat(1, list_y_NN[c-1]), dico["w"+str(c)+str(n)]) + dico["b"+str(c)+str(n)])
+                            dico["y"+"_"+str(c)+"_"+str(n)] = tf.nn.softmax(tf.matmul(tf.concat(1, list_y_NN[c-1]), dico["w"+"_"+str(c)+"_"+str(n)]) + dico["b"+"_"+str(c)+"_"+str(n)])
                     # Ajout de y à la list pour la couche actuelle
-                    list_y.append(dico["y"+str(c)+str(n)])
+                    list_y.append(dico["y"+"_"+str(c)+"_"+str(n)])
                     
                 #Couche d'entrée
                 elif(c==0):
                     # Défintion des poids
-                    dico["w"+str(c)+str(n)] = tf.Variable(tf.random_uniform([self.n_dim, proj], self.interval_init_weight[0], self.interval_init_weight[1]))
+                    dico["w"+"_"+str(c)+"_"+str(n)] = tf.Variable(tf.random_uniform([self.n_dim, proj], self.interval_init_weight[0], self.interval_init_weight[1]))
                     # Définition du biais
-                    dico["b"+str(c)+str(n)] = tf.Variable(tf.zeros([proj]))
+                    dico["b"+"_"+str(c)+"_"+str(n)] = tf.Variable(tf.zeros([proj]))
                     # Calcul de la sortie y
                     with tf.name_scope("couche_entree") as scope:
-                        dico["y"+str(c)+str(n)] = f(tf.matmul(X, dico["w"+str(c)+str(n)]) + dico["b"+str(c)+str(n)])
+                        dico["y"+"_"+str(c)+"_"+str(n)] = f(tf.matmul(X, dico["w"+"_"+str(c)+"_"+str(n)]) + dico["b"+"_"+str(c)+"_"+str(n)])
                     # Ajout de y à la list pour la couche actuelle
-                    list_y.append(dico["y"+str(c)+str(n)])
+                    list_y.append(dico["y"+"_"+str(c)+"_"+str(n)])
                     
                 #Couche(s) cachée(s)
                 else:
                     # Définition des poids
-                    dico["w"+str(c)+str(n)] = tf.Variable(tf.random_uniform([N[c-1]*proj, proj], self.interval_init_weight[0], self.interval_init_weight[1]))
+                    dico["w"+"_"+str(c)+"_"+str(n)] = tf.Variable(tf.random_uniform([N[c-1]*proj, proj], self.interval_init_weight[0], self.interval_init_weight[1]))
                     # Définiton du biais
-                    dico["b"+str(c)+str(n)] = tf.Variable(tf.zeros([proj]))
+                    dico["b"+"_"+str(c)+"_"+str(n)] = tf.Variable(tf.zeros([proj]))
                     # Calcul de la sortie y
                     with tf.name_scope("couches_cachees") as scope:
-                        dico["y"+str(c)+str(n)] = f(tf.matmul(tf.concat(1, list_y_NN[c-1]), dico["w"+str(c)+str(n)]) + dico["b"+str(c)+str(n)])
+                        dico["y"+"_"+str(c)+"_"+str(n)] = f(tf.matmul(tf.concat(1, list_y_NN[c-1]), dico["w"+"_"+str(c)+"_"+str(n)]) + dico["b"+"_"+str(c)+"_"+str(n)])
                     # Ajout de y à la list pour la couche actuelle
-                    list_y.append(dico["y"+str(c)+str(n)])
+                    list_y.append(dico["y"+"_"+str(c)+"_"+str(n)])
             list_y_NN.append(list_y)
         return dico
 
@@ -472,22 +467,22 @@ class MLP_training:
 
                 #Formule du coût à optimiser
                 if(loss=='mse'):
-                    l=tf.reduce_mean(tf.square(NN["y"+str(C-1)+str(N[C-1]-1)]-y_))
+                    l=tf.reduce_mean(tf.square(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]-y_))
                 elif(loss=='hinge'):
-                    l=tf.reduce_mean(tf.maximum(0.0, 1-NN["y"+str(C-1)+str(N[C-1]-1)]*y_))
+                    l=tf.reduce_mean(tf.maximum(0.0, 1-NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]*y_))
                 else: #cas cross entropy
-                    l=-tf.reduce_sum(y_*tf.log(NN["y"+str(C-1)+str(N[C-1]-1)]))
+                    l=-tf.reduce_sum(y_*tf.log(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]))
     
                 #Optimisation par descente de gradient
                 train_step = self.define_grad_optimizer(grad_optimizer, learning_rate).minimize(l)
                 
                 #Calcul de la prédiction et de l'accuracy
                 if(f==tf.tanh and (loss=='mse' or loss=='hinge')):
-                    correct_prediction = tf.equal(tf.sign(NN["y"+str(C-1)+str(N[C-1]-1)]), y_)
+                    correct_prediction = tf.equal(tf.sign(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]), y_)
                 elif(f==tf.sigmoid and (loss=='mse' or loss=='hinge')):
-                    correct_prediction = tf.equal(tf.cast(NN["y"+str(C-1)+str(N[C-1]-1)]>0.5, tf.float32), y_) #Recentrage entre 0 et 1 pour le cas sigmoid
+                    correct_prediction = tf.equal(tf.cast(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]>0.5, tf.float32), y_) #Recentrage entre 0 et 1 pour le cas sigmoid
                 else:
-                    correct_prediction = tf.equal(tf.argmax(NN["y"+str(C-1)+str(N[C-1]-1)],1), tf.argmax(y_, 1))
+                    correct_prediction = tf.equal(tf.argmax(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)],1), tf.argmax(y_, 1))
                 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
                 
                 #Calcul du nombre d'évaluation à effectuer lors de l'apprentissage
@@ -637,15 +632,15 @@ class MLP_training:
                 #Formule du coût à optimiser
                 if(loss=='mse'):
                     with tf.name_scope("mse_criterion") as scope:
-                        l=tf.reduce_mean(tf.square(NN["y"+str(C-1)+str(N[C-1]-1)]-y_))
+                        l=tf.reduce_mean(tf.square(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]-y_))
                         l_summ = tf.scalar_summary("mse",l)
                 elif(loss=='hinge'):
                     with tf.name_scope("hinge_criterion") as scope:
-                        l=tf.reduce_mean(tf.maximum(0.0, 1-NN["y"+str(C-1)+str(N[C-1]-1)]*y_))
+                        l=tf.reduce_mean(tf.maximum(0.0, 1-NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]*y_))
                         l_summ = tf.scalar_summary("hinge_loss",l)
                 else: #cas cross entropy
                     with tf.name_scope("cross_entropy_criterion") as scope:
-                        l=-tf.reduce_sum(y_*tf.log(NN["y"+str(C-1)+str(N[C-1]-1)]))
+                        l=-tf.reduce_sum(y_*tf.log(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]))
                         l_summ = tf.scalar_summary("cross_entropy",l)
 
                 #Optimisation par descente de gradient
@@ -655,11 +650,11 @@ class MLP_training:
                 #Calcul de la prédiction et de l'accuracy
                 with tf.name_scope("test") as scope:
                     if(f==tf.tanh and (loss=='mse' or loss=='hinge')):
-                        correct_prediction = tf.equal(tf.sign(NN["y"+str(C-1)+str(N[C-1]-1)]), y_)
+                        correct_prediction = tf.equal(tf.sign(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]), y_)
                     elif(f==tf.sigmoid and (loss=='mse' or loss=='hinge')):
-                        correct_prediction = tf.equal(tf.cast(NN["y"+str(C-1)+str(N[C-1]-1)]>0.5, tf.float32), y_) #Recentrage entre -1 et 1 pour le cas sigmoid
+                        correct_prediction = tf.equal(tf.cast(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]>0.5, tf.float32), y_) #Recentrage entre -1 et 1 pour le cas sigmoid
                     else:
-                        correct_prediction = tf.equal(tf.argmax(NN["y"+str(C-1)+str(N[C-1]-1)],1), tf.argmax(y_, 1))
+                        correct_prediction = tf.equal(tf.argmax(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)],1), tf.argmax(y_, 1))
                     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
                     
                 merged = tf.merge_all_summaries()
@@ -805,19 +800,19 @@ class MLP_training:
                 for n in range(N[c]):
                     if(c==C-1 and c==0):
                         if(loss=='mse' or loss=='hinge'):
-                            output = f(sigmoid(tf.matmul(X_, NN["w"+str(c)+str(n)]) + NN["b"+str(c)+str(n)]))
+                            output = f(sigmoid(tf.matmul(X_, NN["w"+"_"+str(c)+"_"+str(n)]) + NN["b"+"_"+str(c)+"_"+str(n)]))
                         else: #cas cross_entropy
-                            output = tf.nn.softmax(tf.matmul(X_, NN["w"+str(c)+str(n)]) + NN["b"+str(c)+str(n)])
+                            output = tf.nn.softmax(tf.matmul(X_, NN["w"+"_"+str(c)+"_"+str(n)]) + NN["b"+"_"+str(c)+"_"+str(n)])
                     elif(c==C-1):
                         if(loss=='mse' or loss=='hinge'):
-                            output = f(tf.matmul(tf.concat(1, list_y_NN[c-1]), NN["w"+str(c)+str(n)]) + NN["b"+str(c)+str(n)])
+                            output = f(tf.matmul(tf.concat(1, list_y_NN[c-1]), NN["w"+"_"+str(c)+"_"+str(n)]) + NN["b"+"_"+str(c)+"_"+str(n)])
                         else:
-                            output = tf.nn.softmax(f(tf.matmul(tf.concat(1, list_y_NN[c-1]), NN["w"+str(c)+str(n)]) + NN["b"+str(c)+str(n)]))
+                            output = tf.nn.softmax(f(tf.matmul(tf.concat(1, list_y_NN[c-1]), NN["w"+"_"+str(c)+"_"+str(n)]) + NN["b"+"_"+str(c)+"_"+str(n)]))
                     elif(c==0):
-                        y = f(tf.matmul(X_, NN["w"+str(c)+str(n)]) + NN["b"+str(c)+str(n)])
+                        y = f(tf.matmul(X_, NN["w"+"_"+str(c)+"_"+str(n)]) + NN["b"+"_"+str(c)+"_"+str(n)])
                         list_y.append(y)
                     else:
-                        y = f(tf.matmul(tf.concat(1, list_y_NN[c-1]), NN["w"+str(c)+str(n)]) + NN["b"+str(c)+str(n)])
+                        y = f(tf.matmul(tf.concat(1, list_y_NN[c-1]), NN["w"+"_"+str(c)+"_"+str(n)]) + NN["b"+"_"+str(c)+"_"+str(n)])
                         list_y.append(y)
                 list_y_NN.append(list_y)
 
@@ -861,14 +856,14 @@ class MLP_training:
                 list_y=[]
                 for n in range(N[c]):
                     if(c==C-1 and c==0):
-                        output = tf.nn.softmax(tf.matmul(X_, NN["w"+str(c)+str(n)]) + NN["b"+str(c)+str(n)])
+                        output = tf.nn.softmax(tf.matmul(X_, NN["w"+"_"+str(c)+"_"+str(n)]) + NN["b"+"_"+str(c)+"_"+str(n)])
                     elif(c==C-1):
-                        output = tf.nn.softmax(f(tf.matmul(tf.concat(1, list_y_NN[c-1]), NN["w"+str(c)+str(n)]) + NN["b"+str(c)+str(n)]))
+                        output = tf.nn.softmax(f(tf.matmul(tf.concat(1, list_y_NN[c-1]), NN["w"+"_"+str(c)+"_"+str(n)]) + NN["b"+"_"+str(c)+"_"+str(n)]))
                     elif(c==0):
-                        y = f(tf.matmul(X_, NN["w"+str(c)+str(n)]) + NN["b"+str(c)+str(n)])
+                        y = f(tf.matmul(X_, NN["w"+"_"+str(c)+"_"+str(n)]) + NN["b"+"_"+str(c)+"_"+str(n)])
                         list_y.append(y)
                     else:
-                        y = f(tf.matmul(tf.concat(1, list_y_NN[c-1]), NN["w"+str(c)+str(n)]) + NN["b"+str(c)+str(n)])
+                        y = f(tf.matmul(tf.concat(1, list_y_NN[c-1]), NN["w"+"_"+str(c)+"_"+str(n)]) + NN["b"+"_"+str(c)+"_"+str(n)])
                         list_y.append(y)
                 list_y_NN.append(list_y)
 
@@ -1174,22 +1169,22 @@ class MLP_training:
 
                 #Formule du coût à optimiser
                 if(loss=='mse'):
-                    l=tf.reduce_mean(tf.square(NN["y"+str(C-1)+str(N[C-1]-1)]-y_))
+                    l=tf.reduce_mean(tf.square(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]-y_))
                 elif(loss=='hinge'):
-                    l=tf.reduce_mean(tf.maximum(0.0, 1-NN["y"+str(C-1)+str(N[C-1]-1)]*y_))
+                    l=tf.reduce_mean(tf.maximum(0.0, 1-NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]*y_))
                 else: #cas cross entropy
-                    l=-tf.reduce_sum(y_*tf.log(NN["y"+str(C-1)+str(N[C-1]-1)]))
+                    l=-tf.reduce_sum(y_*tf.log(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]))
     
                 #Optimisation par descente de gradient
                 train_step = self.define_grad_optimizer(grad_optimizer, learning_rate).minimize(l)
                 
                 #Calcul de la prédiction et de l'accuracy
                 if(f==tf.tanh and (loss=='mse' or loss=='hinge')):
-                    correct_prediction = tf.equal(tf.sign(NN["y"+str(C-1)+str(N[C-1]-1)]), y_)
+                    correct_prediction = tf.equal(tf.sign(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]), y_)
                 elif(f==tf.sigmoid and (loss=='mse' or loss=='hinge')):
-                    correct_prediction = tf.equal(tf.cast(NN["y"+str(C-1)+str(N[C-1]-1)]>0.5, tf.float32), y_) #Recentrage entre 0 et 1 pour le cas sigmoid
+                    correct_prediction = tf.equal(tf.cast(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)]>0.5, tf.float32), y_) #Recentrage entre 0 et 1 pour le cas sigmoid
                 else:
-                    correct_prediction = tf.equal(tf.argmax(NN["y"+str(C-1)+str(N[C-1]-1)],1), tf.argmax(y_, 1))
+                    correct_prediction = tf.equal(tf.argmax(NN["y"+"_"+str(C-1)+"_"+str(N[C-1]-1)],1), tf.argmax(y_, 1))
                 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
                 
                 #Calcul du nombre d'évaluation à effectuer lors de l'apprentissage
